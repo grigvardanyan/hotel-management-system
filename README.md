@@ -144,20 +144,6 @@ Examples:
 - Logging  
 - Unit tests  
 
----
-
-## 📊 Evaluation Criteria  
-
-| Criteria | Weight |
-|---------|--------|
-| Functionality | 40% |
-| OOP Design | 20% |
-| Exception Handling | 15% |
-| File Handling | 10% |
-| Code Quality | 10% |
-| Extra Features | 5% |
-
----
 
 ## 📅 Suggested Development Stages  
 
@@ -174,15 +160,6 @@ Examples:
 - File saving/loading  
 - Reports  
 - Final improvements  
-
----
-
-## 📝 Submission Requirements  
-
-Submit:  
-- source code  
-- data files (if used)  
-- README file with instructions  
 
 ---
 
