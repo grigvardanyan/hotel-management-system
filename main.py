@@ -1,89 +1,107 @@
 
-    
 from hotelmanager import HotelManager
-
-hotel = HotelManager()
-
-def addRoomMenu():
-    number = int(input("Enter room number: "))
-    room_type = input("Enter room type (Single/Double/Suite): ")
-    hotel.add_room(number, room_type)
-    print(f"Room {number} added successfully.")
-
-def registerGuestMenu():
-    name = input("Enter guest name: ")
-    phone = input("Enter guest phone: ")
-    guest_id = hotel.register_guest(name, phone)
-    print(f"Guest {name} registered successfully with ID {guest_id}.")
-
-def createReservationMenu():
-    guest_id = int(input("Enter guest ID: "))
-    room_number = int(input("Enter room number: "))
-    check_in = input("Enter check-in date (YYYY-MM-DD): ")
-    check_out = input("Enter check-out date (YYYY-MM-DD): ")
-    nights = int(input("Enter number of nights: "))
-    discount = float(input("Enter discount percentage (0 if none): "))
-    
-    reservation = hotel.create_reservation(guest_id, room_number, check_in, check_out, nights, discount)
-    if reservation:
-        print(f"Reservation created successfully for guest ID {guest_id} in room {room_number}.")
-    else:
-        print("Failed to create reservation. Please check guest ID and room availability.")
-
-def checkInMenu():
-    room_number = int(input("Enter room number for check-in: "))
-    if hotel.check_in_guest(room_number):
-        print(f"Guest checked in to room {room_number} successfully.")
-    else:
-        print("Failed to check in. Please check room number.")
-
-def checkOutMenu():
-    room_number = int(input("Enter room number for check-out: "))
-    if hotel.check_out_guest(room_number):
-        print(f"Guest checked out from room {room_number} successfully.")
-    else:
-        print("Failed to check out. Please check room number.")
-def viewRoomsMenu():
-    print("-------------------11------------------")
-    hotel.view_rooms()
-
-def viewGuestsMenu():
-    hotel.view_guests() 
-    print("-------------------22-----------------")
-def mainMenu():
-        print("\nHotel Management System")
-        print("1. Add Room")
-        print("2. Register Guest")
-        print("3. Create Reservation")
-        print("4. Check In Guest")
-        print("5. Check Out Guest")
-        print("6. View Rooms")
-        print("7. View Guests")
-        print("0. Exit")
+from models.room import Standard, Deluxe, Suite
 
 def main():
-
+    hotel = HotelManager()
+    
     while True:
-        mainMenu()
-        choice = input("Enter your choice: ")
-        if choice == '1':
-            addRoomMenu()
-        elif choice == '2':
-            registerGuestMenu()
-        elif choice == '3':
-            createReservationMenu()
-        elif choice == '4':
-            checkInMenu()
-        elif choice == '5':
-            checkOutMenu()
-        elif choice == '6':
-            viewRoomsMenu()
-        elif choice == '7':
-            viewGuestsMenu()
-        elif choice == '0':
-            print("Exiting the system. Goodbye!")
-            break
+        print("\n=== HOTEL MANAGEMENT ===")
+        print("[1] Add Room")
+        print("[2] Register Guest")
+        print("[3] Create Reservation")
+        print("[4] Check-in Guest")
+        print("[5] Check-out Guest")
+        print("[6] View Rooms")
+        print("[7] View Guests")
+        print("[8] Exit")
+        
+        choice = input("Enter choice: ").strip()
+        
+        if choice == "1":
+            try:
+                number = int(input("Enter room number: "))
+                print("1. Standard ($100/night)")
+                print("2. Deluxe ($150/night)")
+                print("3. Suite ($250/night)")
+                room_choice = input("Select room type: ")
+                
+                if room_choice == "1":
+                    hotel.add_room(Standard(number))
+                elif room_choice == "2":
+                    hotel.add_room(Deluxe(number))
+                elif room_choice == "3":
+                    hotel.add_room(Suite(number))
+                else:
+                    print("Invalid choice!")
+                    continue
+                print(f"Room {number} added!")
+            except ValueError:
+                print("Invalid input!")
+        
+        elif choice == "2":
+            name = input("Enter guest name: ")
+            phone = input("Enter phone: ")
+            hotel.register_guest(name, phone)
+            print(f"Guest '{name}' registered!")
+        
+        elif choice == "3":
+            guest_name = input("Enter guest name: ")
+            guest = hotel.find_guest(guest_name)
+            if not guest:
+                print("Guest not found!")
+                continue
+            
+            try:
+                room_num = int(input("Enter room number: "))
+                room = hotel.find_room(room_num)
+                if not room:
+                    print("Room not found!")
+                    continue
+                if not room.available:
+                    print("Room not available!")
+                    continue
+                
+                check_in = input("Check-in date (YYYY-MM-DD): ")
+                check_out = input("Check-out date (YYYY-MM-DD): ")
+                nights = int(input("Number of nights: "))
+                discount = int(input("Discount %: "))
+                
+                reservation = hotel.create_reservation(guest, room, check_in, check_out, nights, discount)
+                cost = reservation.get_cost()
+                print(f"Reservation created! Cost: ${cost:.2f}")
+            except ValueError:
+                print("Invalid input!")
+        
+        elif choice == "4":
+            try:
+                room_num = int(input("Enter room number: "))
+                hotel.check_in(room_num)
+                print("Guest checked in!")
+            except ValueError:
+                print("Invalid input!")
+        
+        elif choice == "5":
+            try:
+                room_num = int(input("Enter room number: "))
+                hotel.check_out(room_num)
+                print("Guest checked out!")
+            except ValueError:
+                print("Invalid input!")
+        
+        elif choice == "6":
+            print("\n--- ROOMS ---")
+            for room in hotel.rooms:
+                status = "Available" if room.available else f"Occupied ({room.guest.name})"
+                print(f"Room {room.number} ({room.__class__.__name__}): ${room.get_price()} - {status}")
+        
+        elif choice == "7":
+            print("\n--- GUESTS ---")
+            for guest in hotel.guests:
+                print(f"{guest.name} - {guest.phone}")
+        
         else:
-            print("Invalid choice. Please try again.")
+            print("Invalid choice!")
+
 if __name__ == "__main__":
     main()
